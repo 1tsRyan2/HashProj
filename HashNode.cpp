@@ -30,8 +30,10 @@ hashNode::hashNode(string s, string v){
 	currSize = 1;
 }
 void hashNode::addValue(string v) {
-	// adding a valu to the end of the value array associated 
-	// with a key
+	if (currSize == valuesSize) {
+		dblArray();
+	}
+	values[currSize++] = v;
 }
 void hashNode::dblArray() {
 	// when the value array gets full, you need to make a new 
