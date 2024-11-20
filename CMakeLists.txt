@@ -7,6 +7,8 @@ add_executable(HashProj
         HashMap.cpp
         HashMap.hpp
         HashNode.cpp
-        MakeSeuss.hpp
+        HashNode.hpp
         MakeSeuss.cpp
-        mainHash.cpp)
+        MakeSeuss.hpp
+        mainHash.cpp
+)

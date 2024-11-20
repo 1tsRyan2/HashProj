@@ -1,4 +1,3 @@
-
 #include "makeSeuss.hpp"
 #include "hashMap.hpp"
 
@@ -9,25 +8,21 @@
 
 using namespace std;
 
-makeSeuss::makeSeuss(string f1,string f2,bool hash1, bool coll1) {
-	ht = new hashMap(hash1,coll1);
+makeSeuss::makeSeuss(string f1,string f2,bool h1, bool c1) {
+	ht = new hashMap(h1,c1);
 	newfile = f2;
 	fn = f1;
-
 	readFile();
 	writeFile();
 }
 void makeSeuss::readFile() {
 	ifstream infile(fn.c_str(),ios::in);     // open file
 	string key = "";
-	string value="";
+	string value= "";
 	infile>> key;
-
-	infile >> key;
 	ht->first = key;
-
 	while (infile >> value) {          // loop getting single characters
-		//cout << key <<": " << value << endl;
+		cout << key <<": " << value << endl;
 		ht->addKeyValue(key,value);
 		key = value;
 		value = "";
@@ -35,26 +30,10 @@ void makeSeuss::readFile() {
 	ht->addKeyValue(key,value);
 	cout << endl;
 	infile.close();
-
-	ht->printMap();
 }
 void makeSeuss::writeFile() {
 	ofstream outfile(newfile.c_str(),ios::out);
-	float hashfloat = (float)ht->hashcoll/(float)ht->numKeys;
-	float collfloat =  (float)ht->collisions/(float)ht->numKeys;
-	if (ht->hashfn && ht->collfn) {
-		outfile << "Collisions using hash 1: "<< hashfloat << ", and collision handling 1: " << collfloat <<endl;
-	}
-	else if (ht->hashfn) {
-		outfile << "Collisions using hash 1: "<< hashfloat << ", and collision handling 2: " << collfloat<<endl;
-	}
-	else if (ht->collfn) {
-		outfile << "Collisions using hash 2: "<< hashfloat << ", and collision handling 1: " << collfloat<<endl;
-	}
-	else {
-		outfile << "Collisions using hash 2: "<< hashfloat << ", and collision handling 2: " << collfloat<<endl;
-	}
-	outfile<<endl;
+
 	outfile << ht->first << " ";
 	string key = "";
 	string value = ht->map[ht->getIndex(ht->first)]->getRandValue();
@@ -74,4 +53,4 @@ void makeSeuss::writeFile() {
 	outfile.close();
 }
 
-
+#endif /* MAKESEUSS_HPP_ */
