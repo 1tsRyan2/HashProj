@@ -36,18 +36,16 @@ void hashNode::addValue(string v) {
 	values[currSize++] = v;
 }
 void hashNode::dblArray() {
-	// when the value array gets full, you need to make a new 
-	// array twice the size of the old one (just double, no 
-	//going to next prime) and then copy over the old values 
-	//to the new values, then de-allocate the old array.  
-	//Again, just copying over, no hash functiosn involved 
-	//here.
+	valuesSize *= 2;
+	string* newValues = new string[valuesSize];
+	for (int i = 0; i < currSize; i++) {
+		newValues[i] = values[i];
+	}
+	delete[] values;
+	values = newValues;
 }
-
 string hashNode::getRandValue() {
-	//Every key has a values array - an array of words that 
-	// follow that key in the text document.  You're going to 
-	//randomly select one of those words and return it.  That 
-	//will be the word that follows your key in your output 
-	//function, and it will also be the next key.
+	if (currSize =0) return "";
+	int randIndex = rand() % currSize;
+	return values[randIndex];
 }
