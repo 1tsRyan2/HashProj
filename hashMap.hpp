@@ -28,8 +28,10 @@ class hashMap {
 			//collision-handling method
 	int hashcoll; //number of initial collisions using just 
 			//the hash function
-
+	bool useHash1;
+	bool useColl1;
 public:
+	float getLoadFactor();
 	hashMap(bool hash1, bool coll1);  // when creating the 
 			//map, make sure you initialize the values to 
 			//NULL so you know whether that index has a key 

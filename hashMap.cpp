@@ -4,11 +4,60 @@
 #include <math.h>
 using namespace std;
 
+float hashMap::getLoadFactor() {
+    return static_cast<float>(numKeys) / mapSize;
+}
+
+
 hashMap::hashMap(bool hash1, bool coll1) {
+    useHash1 = hash1;
+    useColl1 = coll1;
+
+    mapSize = 100;
+    map = new hashNode*[mapSize];
+
+    for (int i = 0; i < mapSize; i++) {
+        map[1] = NULL;
+    }
+    numKeys = 0;
+    first = "";
 }
 void hashMap::addKeyValue(string k, string v) {
+    int index = useHash1 ? calcHash1(k) : calcHash2(k);
+    int originalIndex = index;
+    int i = 0;
+
+    while (map[index] != NULL) {
+        if (map[index]->keyword == k) {
+            map[index]->addValue(v);
+            return;
+        }
+        index = coll1 ? coll1(originalIndex, ++i, k) : coll2(originalIndex, ++i, k);
+        if (i > mapSize) {
+            cout <<"error: map is full or too many keys." << endl;
+            return;
+        }
+    }
+    map[index] = new hashNode(k, v);
+    numKeys++;
+
+    if (getLoadFactor() > 0.7) {
+        reHash();
+    }
+
 }
 int hashMap::getIndex(string k) {
+    int index = useHash1 ? calcHash1(k) : calcHash2(k);
+    int originalIndex = index;
+    int i = 0;
+
+    while (map[index] != NULL) {
+        if (map[index]->keyword == k) {
+            return index;
+        }
+        index = useColl1 ? coll1(originalIndex, ++i, k) : coll2(originalIndex, ++i, k);
+    }
+    return -1;
 }
 
 int hashMap::calcHash2(string k){
