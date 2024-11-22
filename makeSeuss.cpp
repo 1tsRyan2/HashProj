@@ -16,21 +16,35 @@ makeSeuss::makeSeuss(string f1,string f2,bool h1, bool c1) {
 	writeFile();
 }
 void makeSeuss::readFile() {
-	ifstream infile(fn.c_str(),ios::in);     // open file
-	string key = "";
-	string value= "";
-	infile>> key;
-	ht->first = key;
-	while (infile >> value) {          // loop getting single characters
-		cout << key <<": " << value << endl;
-		ht->addKeyValue(key,value);
-		key = value;
-		value = "";
+	ifstream infile(fn.c_str(), ios::in);
+	if (!infile) {
+		cerr << "Error: Could not open input file: " << fn << endl;
+		return;
 	}
-	ht->addKeyValue(key,value);
-	cout << endl;
+
+	string key = "", value = "";
+	infile >> key;
+
+	// Skip BOM if present
+	if (!key.empty() && (unsigned char)key[0] == 0xEF) {
+		infile >> key;
+	}
+
+	ht->first = key;
+
+	while (infile >> value) {
+		// Skip non-printable characters
+		if (value.empty() || !isprint(value[0])) {
+			continue;
+		}
+
+		ht->addKeyValue(key, value);
+		key = value;
+	}
+
 	infile.close();
 }
+
 void makeSeuss::writeFile() {
 	ofstream outfile(newfile.c_str(),ios::out);
 

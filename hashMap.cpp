@@ -1,13 +1,11 @@
 #include "hashMap.hpp"
 #include "hashNode.hpp"
-#include <iostream>
 #include <math.h>
 using namespace std;
 
 float hashMap::getLoadFactor() {
     return static_cast<float>(numKeys) / mapSize;
 }
-
 
 hashMap::hashMap(bool hash1, bool coll1) {
     useHash1 = hash1;
@@ -17,12 +15,15 @@ hashMap::hashMap(bool hash1, bool coll1) {
     map = new hashNode*[mapSize];
 
     for (int i = 0; i < mapSize; i++) {
-        map[i] = nullptr;
+        map[i] = nullptr; // Initialize all pointers to nullptr
     }
     numKeys = 0;
     first = "";
 }
+
 void hashMap::addKeyValue(string k, string v) {
+    if (k.empty()) return;
+
     int index = useHash1 ? calcHash1(k) : calcHash2(k);
     int originalIndex = index;
     int i = 0;
@@ -33,19 +34,18 @@ void hashMap::addKeyValue(string k, string v) {
             return;
         }
         index = useColl1 ? coll1(originalIndex, ++i, k) : coll2(originalIndex, ++i, k);
-        if (i > mapSize) {
-            cout <<"error: map is full or too many keys." << endl;
-            return;
-        }
+
+        if (i >= mapSize) return;
     }
+
     map[index] = new hashNode(k, v);
     numKeys++;
 
     if (getLoadFactor() > 0.7) {
         reHash();
     }
-
 }
+
 int hashMap::getIndex(string k) {
     int index = useHash1 ? calcHash1(k) : calcHash2(k);
     int originalIndex = index;
@@ -57,10 +57,12 @@ int hashMap::getIndex(string k) {
         }
         index = useColl1 ? coll1(originalIndex, ++i, k) : coll2(originalIndex, ++i, k);
     }
-    return -1;
+    return -1; // Key not found
 }
 
-int hashMap::calcHash2(string k){
+int hashMap::calcHash2(string k) {
+    if (k.empty()) return 0;
+
     int hash = 0;
     int p = 37;
     int m = mapSize;
@@ -69,18 +71,22 @@ int hashMap::calcHash2(string k){
     }
     return hash;
 }
-int hashMap::calcHash1(string k){
-    unsigned int hash = 2166136261; // FNV offset basis
-    unsigned int prime = 16777619; // FNV prime
+
+int hashMap::calcHash1(string k) {
+    if (k.empty()) return 0;
+
+    unsigned int hash = 2166136261;
+    unsigned int prime = 16777619;
     for (int i = 0; i < k.length(); i++) {
-        hash ^= k[i];            // XOR the byte with the hash
-        hash *= prime;           // Multiply by the FNV prime
-        hash %= mapSize;         // Keep the hash within bounds
+        hash ^= k[i];
+        hash *= prime;
+        hash %= mapSize;
     }
-    return static_cast<int>(hash); // Cast to int and return
+    return static_cast<int>(hash);
 }
+
 void hashMap::getClosestPrime() {
-    int candidate = mapSize * 2; // Start with twice the current map size
+    int candidate = mapSize * 2;
     while (true) {
         bool isPrime = true;
         for (int i = 2; i <= sqrt(candidate); i++) {
@@ -96,18 +102,18 @@ void hashMap::getClosestPrime() {
         candidate++;
     }
 }
+
 void hashMap::reHash() {
     int oldMapSize = mapSize;
     hashNode** oldMap = map;
 
-    // Step 1: Find the new map size
     getClosestPrime();
-    hashNode** newMap = new hashNode*[mapSize];
+    map = new hashNode*[mapSize];
+
     for (int i = 0; i < mapSize; i++) {
-        newMap[i] = nullptr;
+        map[i] = nullptr;
     }
 
-    // Step 2: Rehash all keys from the old map to the new map
     for (int i = 0; i < oldMapSize; i++) {
         if (oldMap[i] != nullptr) {
             hashNode* current = oldMap[i];
@@ -115,32 +121,30 @@ void hashMap::reHash() {
             int originalIndex = index;
             int j = 0;
 
-            while (newMap[index] != nullptr) {
-                index = useColl1 ? coll1(originalIndex, ++j, current->keyword) : coll2(originalIndex, ++j, current->keyword);
+            while (map[index] != nullptr) {
+                index = useColl1 ? coll1(originalIndex, ++j, current->keyword)
+                                 : coll2(originalIndex, ++j, current->keyword);
             }
-            newMap[index] = current;
+            map[index] = current;
         }
     }
 
-    // Step 3: Update map pointer and size
-    delete[] oldMap;
-    map = newMap;
+    delete[] oldMap; // Clean up old map
 }
 
 int hashMap::coll1(int h, int i, string k) {
-    return (h + i) % mapSize; // Linear probing: move to the next slot
+    return (h + i) % mapSize; // Linear probing
 }
+
 int hashMap::coll2(int h, int i, string k) {
-    return (h + i * i) % mapSize; // Quadratic probing: jump by i^2
+    return (h + i * i) % mapSize; // Quadratic probing
 }
 
 void hashMap::printMap() {
-    cout << "In printMap()" << endl;
     for (int i = 0; i < mapSize; i++) {
-        //cout << "In loop" << endl;
         if (map[i] != nullptr) {
             cout << map[i]->keyword << ": ";
-            for (int j = 0; j < map[i]->currSize;j++) {
+            for (int j = 0; j < map[i]->currSize; j++) {
                 cout << map[i]->values[j] << ", ";
             }
             cout << endl;
