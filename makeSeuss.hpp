@@ -2,16 +2,18 @@
 #define MAKESEUSS_HPP_
 
 #include "hashMap.hpp"
-#include <iostream>
-using namespace std;
+#include <string>
 
 class makeSeuss {
-	hashMap *ht;
-	string fn;  // file name for input (“DrSeuss.txt”)
-	string newfile;  // name of output file
+    hashMap *ht;
+    std::string newfile;
+    std::string fn;
+
 public:
-	makeSeuss(string file,string newf,bool h1, bool c1);
-	void readFile();
-	void writeFile();
+    makeSeuss(std::string inputFile, std::string outputFile, bool hash1, bool coll1);
+    void processFile();
+    void createOutputFile();
+    void collisionsPrint();
 };
-#endif
+
+#endif /* MAKESEUSS_HPP_ */

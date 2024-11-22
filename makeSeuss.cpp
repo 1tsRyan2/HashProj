@@ -1,68 +1,54 @@
 #include "makeSeuss.hpp"
-#include "hashMap.hpp"
-
-#include <iostream>
-#include <stdlib.h>
-#include <string>
 #include <fstream>
+#include <iostream>
 
-using namespace std;
-
-makeSeuss::makeSeuss(string f1,string f2,bool h1, bool c1) {
-	ht = new hashMap(h1,c1);
-	newfile = f2;
-	fn = f1;
-	readFile();
-	writeFile();
-}
-void makeSeuss::readFile() {
-	ifstream infile(fn.c_str(), ios::in);
-	if (!infile) {
-		cerr << "Error: Could not open input file: " << fn << endl;
-		return;
-	}
-
-	string key = "", value = "";
-	infile >> key;
-
-	// Skip BOM if present
-	if (!key.empty() && (unsigned char)key[0] == 0xEF) {
-		infile >> key;
-	}
-
-	ht->first = key;
-
-	while (infile >> value) {
-		// Skip non-printable characters
-		if (value.empty() || !isprint(value[0])) {
-			continue;
-		}
-
-		ht->addKeyValue(key, value);
-		key = value;
-	}
-
-	infile.close();
+makeSeuss::makeSeuss(std::string inputFile, std::string outputFile, bool hash1, bool coll1) {
+    ht = new hashMap(hash1, coll1);
+    newfile = outputFile;
+    fn = inputFile;
+    processFile();
+    createOutputFile();
 }
 
-void makeSeuss::writeFile() {
-	ofstream outfile(newfile.c_str(),ios::out);
+void makeSeuss::processFile() {
+    std::ifstream infile(fn.c_str(), std::ios::in);
+    std::string key, value;
+    if (infile >> key) {
+        ht->first = key;
+    }
+    while (infile >> value) {
+        ht->addKeyValue(key, value);
+        key = value;
+    }
+    infile.close();
+}
 
-	outfile << ht->first << " ";
-	string key = "";
-	string value = ht->map[ht->getIndex(ht->first)]->getRandValue();
-	int ct = 0;
-	int len = 0;
-	while (ct < 500 &&  value != "") {
-		key = value;
-		outfile << key << " ";
-		if (len == 11) {
-			outfile << "\n";
-			len = 0;
-		}
-		else len++;
-		value = ht->map[ht->getIndex(key)]->getRandValue();
-		ct ++;
-	}
-	outfile.close();
+void makeSeuss::createOutputFile() {
+    std::ofstream outfile(newfile.c_str(), std::ios::out);
+    outfile << ht->first << " ";
+    std::string key = ht->first, value;
+    int count = 0, lineLength = 0;
+
+    while (count < 500) {
+        int index = ht->getIndex(key);
+        if (index == -1 || ht->map[index] == nullptr) break;
+        value = ht->map[index]->getRandValue();
+        if (value.empty()) break;
+
+        outfile << value << " ";
+        lineLength++;
+        if (lineLength == 11) {
+            outfile << "\n";
+            lineLength = 0;
+        }
+        key = value;
+        count++;
+    }
+    outfile.close();
+}
+
+void makeSeuss::collisionsPrint() {
+    std::cout << "Collisions for " << newfile << ":\n";
+    ht->collisionsPrint();
+    std::cout << std::endl;
 }

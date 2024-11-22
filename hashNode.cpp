@@ -1,51 +1,45 @@
-
-
-#include "hashMap.hpp"
-#include <iostream>
+#include "hashNode.hpp"
 #include <cstdlib>
-#include <time.h>
-using namespace std;
 
-
-
-hashNode::hashNode(string s){
-	keyword = s;
-	values = new string[100];
-	valuesSize = 100;
-	currSize = 0;
-	srand(time(NULL));
-}
-hashNode::hashNode(){
+hashNode::hashNode() {
 	keyword = "";
-	values = new string[100];
+	valuesSize = 0;
+	currSize = 0;
+	values = nullptr;
+}
+
+hashNode::hashNode(std::string k) {
+	keyword = k;
 	valuesSize = 100;
 	currSize = 0;
-	srand(time(NULL));
+	values = new std::string[valuesSize];
 }
-hashNode::hashNode(string s, string v){
-	keyword = s;
-	values = new string[100];
-	values[0] = v;
+
+hashNode::hashNode(std::string k, std::string v) {
+	keyword = k;
 	valuesSize = 100;
 	currSize = 1;
+	values = new std::string[valuesSize];
+	values[0] = v;
 }
-void hashNode::addValue(string v) {
-	if (currSize == valuesSize) {
-		dblArray();
+
+void hashNode::addValue(std::string v) {
+	if (currSize >= valuesSize) {
+		resizeArray();
 	}
 	values[currSize++] = v;
 }
-void hashNode::dblArray() {
+
+void hashNode::resizeArray() {
 	valuesSize *= 2;
-	string* newValues = new string[valuesSize];
+	std::string *newValues = new std::string[valuesSize];
 	for (int i = 0; i < currSize; i++) {
 		newValues[i] = values[i];
 	}
 	delete[] values;
 	values = newValues;
 }
-string hashNode::getRandValue() {
-	if (currSize =0) return "";
-	int randIndex = rand() % currSize;
-	return values[randIndex];
+
+std::string hashNode::getRandValue() {
+	return currSize == 0 ? "" : values[rand() % currSize];
 }
