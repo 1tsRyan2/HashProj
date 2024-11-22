@@ -52,5 +52,3 @@ void makeSeuss::writeFile() {
 	}
 	outfile.close();
 }
-
-#endif /* MAKESEUSS_HPP_ */

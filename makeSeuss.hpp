@@ -13,5 +13,5 @@ public:
 	makeSeuss(string file,string newf,bool h1, bool c1);
 	void readFile();
 	void writeFile();
-
 };
+#endif
